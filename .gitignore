@@ -1,0 +1,21 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# StatsBomb data cache — large pickles, fetched automatically on first run
+data/raw/
+data/processed/
+
+# Model checkpoints — large binary files, reproducible by running the pipeline
+results/metrics/*.pt
+
+# uv cache
+.uv/
+

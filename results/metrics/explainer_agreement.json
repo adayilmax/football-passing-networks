@@ -1,0 +1,57 @@
+{
+  "top_k": 25,
+  "matches": [
+    {
+      "match_id": 3825637,
+      "outcome": "Home Win",
+      "home_team": "Barcelona",
+      "away_team": "Eibar",
+      "jaccard_home": 0.1111111111111111,
+      "jaccard_away": 0.06382978723404255
+    },
+    {
+      "match_id": 3825599,
+      "outcome": "Home Win",
+      "home_team": "Espanyol",
+      "away_team": "Valencia",
+      "jaccard_home": 0.16279069767441862,
+      "jaccard_away": 0.1111111111111111
+    },
+    {
+      "match_id": 3825765,
+      "outcome": "Draw",
+      "home_team": "Celta Vigo",
+      "away_team": "Sevilla",
+      "jaccard_home": 0.0,
+      "jaccard_away": 0.21951219512195122
+    },
+    {
+      "match_id": 3825697,
+      "outcome": "Draw",
+      "home_team": "Valencia",
+      "away_team": "Getafe",
+      "jaccard_home": 0.041666666666666664,
+      "jaccard_away": 0.08695652173913043
+    },
+    {
+      "match_id": 3825592,
+      "outcome": "Away Win",
+      "home_team": "Real Sociedad",
+      "away_team": "Espanyol",
+      "jaccard_home": 0.06382978723404255,
+      "jaccard_away": 0.13636363636363635
+    },
+    {
+      "match_id": 3825570,
+      "outcome": "Away Win",
+      "home_team": "Granada",
+      "away_team": "Eibar",
+      "jaccard_home": 0.19047619047619047,
+      "jaccard_away": 0.08695652173913043
+    }
+  ],
+  "mean_jaccard_home": 0.09497907552707156,
+  "mean_jaccard_away": 0.11745496221816702,
+  "mean_jaccard_overall": 0.10621701887261929,
+  "random_baseline": 0.13105150503503554
+}
