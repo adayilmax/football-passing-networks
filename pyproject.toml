@@ -1,7 +1,7 @@
 [project]
-name = "gnn-project"
+name = "relational-graph-learning"
 version = "0.1.0"
-description = "GNN-based football match outcome prediction using player passing networks"
+description = "Graph representation learning on relational sports data: GCN and GAT with interpretable attention for match outcome prediction"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

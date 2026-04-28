@@ -1,15 +1,25 @@
-# Football Match Outcome Prediction via Graph Neural Networks
+# Graph Representation Learning on Relational Sports Data: GCN and GAT with Interpretable Attention for Match Outcome Prediction
 
-Predicting the result of a football match (home win / draw / away win) by
-modelling each team's passing behaviour as a **weighted directed graph** and
-learning over it with Graph Convolutional Networks (GCN) and Graph Attention
-Networks (GAT).
+*Encoding team passing behaviour as weighted directed graphs and learning
+over relational structure with GCN and GAT — does topology carry signal
+beyond aggregate statistics?*
 
-Rather than treating a match as a row of aggregate statistics, this project
-encodes the *relational structure* of a team's play: players are nodes,
-directed passes are edges, and both carry rich feature vectors derived from
-event-level tracking data. The graph structure itself (who passes to whom,
-how often, and with what success) is the input signal.
+Aggregate match statistics — possession percentage, total passes,
+shots on target — flatten the relational structure of a team's play
+into a single row of numbers. This project asks whether encoding
+that structure explicitly as a weighted directed graph, and learning
+over it with Graph Neural Networks, recovers predictive signal that
+aggregation discards. Each team in each match is represented as a
+player-interaction graph: nodes carry positional and pass-quality
+features, directed edges carry frequency, success rate, and mean
+length. A shared-weight dual encoder produces one graph embedding
+per team; the pair is classified by an MLP. The central finding is
+that GNNs outperform a logistic regression baseline receiving the
+same features flattened (GAT F1 0.613 vs LR 0.583), isolating graph
+topology as the source of the gain — and that two interpretability
+methods applied to the same models identify entirely different
+player relationships (GNNExplainer vs GAT attention mean Jaccard
+0.106, at or below random baseline 0.131).
 
 ## Key Findings
 
@@ -24,16 +34,6 @@ Five headline results from training and evaluating on 380 La Liga 2015/16 matche
 4. **Draws are consistently hardest to predict** (best F1: 0.538), reflecting their inherent tactical ambiguity, a finding consistent across GCN, GAT, and the logistic regression baseline.
 
 5. **GNNExplainer and GAT attention disagree on which edges matter.** Across 6 test matches, the top-25 edges identified by GNNExplainer (post-hoc, on the GCN) and by GAT attention (intrinsic) overlap with mean Jaccard **0.106**, at or below a random baseline of **0.131**. Interpretability methods that both look reasonable can identify entirely different signals.
-
-## Novel Contributions
-
-| Contribution | Detail |
-|---|---|
-| **Player-interaction graphs** | Each team in each match is a separate graph; the final prediction is made from the *pair* of graphs (home, away) via a shared encoder |
-| **Edge-conditioned attention** | The GAT uses GATv2Conv with `edge_dim=3`, so each attention coefficient a_{i->j} conditions on both node embeddings and the pass-relationship features — not just node identity |
-| **Interpretable attention weights** | Relative attention (a x in-degree) is extracted per edge and visualised as formation diagrams, showing which player relationships the model weights most |
-| **Temporal sensitivity analysis** | Models are trained on full-match graphs and first-half-only graphs, quantifying how much predictive signal comes from the second half |
-| **Cross-method interpretability check** | GNNExplainer (post-hoc, run on the GCN) and GAT attention (intrinsic) are compared head-to-head; the dual-encoder is wrapped so a single team graph can be explained while the other is held fixed |
 
 ## Dataset
 
@@ -119,7 +119,9 @@ Linear(2 x hidden_dim, hidden_dim) -> ReLU -> Dropout -> Linear(hidden_dim, 3)
 
 ## Results
 
-Test set (57 matches), evaluated with best validation checkpoint.
+All results are on the held-out test set (57 matches) using the
+best validation checkpoint. Each model was trained in a single run;
+see Limitations for variance implications.
 
 | Model | Accuracy | F1 Macro | F1 Weighted | Home Win F1 | Draw F1 | Away Win F1 |
 |---|---|---|---|---|---|---|
@@ -176,6 +178,12 @@ without position being part of the supervision signal.
 ![t-SNE node embeddings](results/plots/tsne_node_embeddings.png)
 
 ## GNNExplainer Analysis
+
+A single interpretability visualisation risks overclaiming — it
+presents one method's view of "what the model looks at" as if it
+were the ground truth. This section tests whether two equally
+reasonable methods (one post-hoc, one intrinsic) agree on which
+player relationships matter, and finds that they do not.
 
 GAT attention is *intrinsic*: the model exposes attention coefficients as part
 of its forward pass, and they only exist for GAT.
@@ -278,7 +286,20 @@ more dependent on that additional data.
 
 ## Limitations
 
-The test set contains 57 matches, which is a small sample for a 3-class problem; result variance across random seeds is unknown because only one training run was performed per model. Training and evaluation are both on La Liga 2015/16, so generalisation to other leagues, seasons, or tactical styles is untested. The cross-method agreement analysis compares GNNExplainer applied to the GCN against attention extracted from the GAT, meaning the low Jaccard score reflects both the methodological difference between post-hoc and intrinsic explanations and the architectural difference between the two models simultaneously — it is not possible to isolate one cause from the other without running both methods on the same model. The temporal analysis retrains the half-match models from scratch on a single run each, so the exact accuracy-drop magnitudes carry unknown variance; the directional finding (both models degrade, GAT more so) is meaningful, but the precise numbers should be treated as indicative rather than definitive.
+All models were trained in a single run with no repeated seeds, so
+reported numbers carry unknown variance; the directional findings
+(GNNs outperform baselines, GAT degrades more under sparser graphs)
+are meaningful but exact magnitudes should be treated as indicative.
+The dataset covers one season of one league (La Liga 2015/16, 380
+matches), and findings may not generalise to other leagues or styles
+of play. The GNNExplainer and GAT attention comparison involves two
+different models (a GCN and a GAT respectively), so disagreement
+between them reflects both method differences and model differences
+and cannot be attributed to either alone. Finally, match outcome
+prediction from passing networks alone discards a large fraction of
+relevant information — set pieces, individual errors, goalkeeper
+performance — that aggregate statistics partially capture and graphs
+do not.
 
 ## Project Structure
 
