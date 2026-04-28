@@ -304,7 +304,7 @@ do not.
 ## Project Structure
 
 ```
-football-passing-networks/
+relational-graph-learning/
 ├── data/
 │   ├── raw/            # StatsBomb event pickles (cached, not committed)
 │   └── processed/      # PyG graph datasets (cached, not committed)
